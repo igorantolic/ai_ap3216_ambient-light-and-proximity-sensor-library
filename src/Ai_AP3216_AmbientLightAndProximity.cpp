@@ -31,11 +31,16 @@ Ai_AP3216_AmbientLightAndProximity::Ai_AP3216_AmbientLightAndProximity(uint8_t i
 
 //............ begin
 void Ai_AP3216_AmbientLightAndProximity::begin() {
+#if defined(ESP8266) || defined(ESP32) 
 	if (pin_sda >= 0 && pin_scl >= 0) {
 		Wire.begin(pin_sda, pin_scl);
 	} else {
 		Wire.begin();
 	}
+#else
+	Wire.begin();
+#endif
+
 	beginWithoutOpeningWire();
 }
 
@@ -128,9 +133,10 @@ int Ai_AP3216_AmbientLightAndProximity::AP3216_read(int regAddress) {
 	Wire.beginTransmission(AP3216_iic_address);
 	Wire.write(regAddress);
 	Wire.endTransmission();
+#if defined(ESP8266) || defined(ESP32) 
 	Wire.requestFrom(AP3216_iic_address, (size_t)1, true);
+#else
+	Wire.requestFrom(AP3216_iic_address, (size_t)1);	
+#endif
 	return Wire.read() & 0xFF;
 }
-
-
-
